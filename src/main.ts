@@ -4,6 +4,7 @@ import {
   CollisionType,
   Color,
   Engine,
+  Keys,
   vec,
 } from "excalibur";
 // game.js
@@ -13,8 +14,8 @@ import {
 // I'm specifying that the game be 800 pixels wide by 600 pixels tall.
 // If no dimensions are specified the game will fit to the screen.
 const game = new Engine({
-  width: 800,
-  height: 600,
+  width: 1910,
+  height: 768,
 });
 // end-snippet{create-engine}
 
@@ -23,10 +24,10 @@ const game = new Engine({
 // y position of 40px from the bottom of the screen,
 // width of 200px, height and a height of 20px
 const paddle = new Actor({
-  x: 150,
-  y: game.drawHeight - 40,
-  width: 200,
-  height: 20,
+  x: 50,
+  y: game.drawHeight / 2 - 100,
+  width: 20,
+  height: 150,
   // Let's give it some color with one of the predefined
   // color constants
   color: Color.Chartreuse,
@@ -44,9 +45,15 @@ game.add(paddle);
 // start-snippet{mouse-move}
 // Add a mouse move listener
 game.input.pointers.primary.on("move", (evt) => {
-  paddle.pos.x = evt.worldPos.x;
+  paddle.pos.x = evt.worldPos.x - game.drawWidth / 2;
+  paddle.pos.y = evt.worldPos.y;
 });
 // end-snippet{mouse-move}
+
+//SETUP KEYBOARD EVENTS
+if (game.input.keyboard.isHeld(Keys.W)) {
+  //paddle.pos.x = evt.worldPos.x;
+}
 
 // start-snippet{create-ball}
 // Create a ball at pos (100, 300) to start
@@ -97,12 +104,19 @@ ball.on("postupdate", () => {
   if (ball.pos.y < ball.height / 2) {
     ball.vel.y = ballSpeed.y;
   }
+
+  // If the ball collides with the top
+  // of the screen reverse the y velocity
+  if (ball.pos.y + ball.height / 2 > game.drawHeight) {
+    ball.vel.y = ballSpeed.y * -1;
+  }
 });
+
 // end-snippet{screen-collision}
 
 // start-snippet{create-bricks}
 // Build Bricks
-
+/*
 // Padding between bricks
 const padding = 20; // px
 const xoffset = 65; // x-offset
@@ -137,17 +151,18 @@ bricks.forEach(function (brick) {
   // Add the brick to the current scene to be drawn
   game.add(brick);
 });
+*/
 // end-snippet{create-bricks}
 
 // start-snippet{ball-brick-collision}
 // On collision remove the brick, bounce the ball
 let colliding = false;
 ball.on("collisionstart", function (ev: CollisionStartEvent) {
-  if (bricks.indexOf(ev.other) > -1) {
-    // kill removes an actor from the current scene
-    // therefore it will no longer be drawn or updated
-    ev.other.kill();
-  }
+  //if (bricks.indexOf(ev.other) > -1) {
+  // kill removes an actor from the current scene
+  // therefore it will no longer be drawn or updated
+  // ev.other.kill();
+  // }
 
   // reverse course after any collision
   // intersections are the direction body A has to move to not be clipping body B
